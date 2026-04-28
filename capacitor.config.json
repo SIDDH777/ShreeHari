@@ -1,0 +1,6 @@
+{
+  "appId": "com.shrihari.app",
+  "appName": "Shri Hari",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
