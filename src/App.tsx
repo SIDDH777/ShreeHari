@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, type FormEvent, type MouseEvent } from "react";
+import { useState, useEffect, ReactNode, FormEvent, MouseEvent } from "react";
 import { 
   Search, 
   User, 
@@ -14,35 +14,30 @@ import {
   ChevronRight, 
   Instagram, 
   Facebook, 
-  Twitter, 
   Home,
   Grid,
   Settings,
-  Trash2,
-  Plus,
-  BarChart2,
+  BarChart3,
   Package,
   TrendingUp,
-  FileText,
-  LogOut
+  LogOut,
+  ChevronDown,
+  ArrowUpRight,
+  ArrowDownRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  AreaChart, Area, BarChart, Bar, Cell, PieChart, Pie
+} from 'recharts';
 
 const INITIAL_PRODUCTS = [
-  { id: 1, name: "Women Cotton Indigo Printed Dress", price: 1499, origPrice: 1999, discount: 25, img: "https://byshree.com/cdn/shop/files/1_2010f26f-fde3-4cac-8f23-2ffb50328a27.jpg?v=1776761818&width=600", stock: 45, buyPrice: 900, sold: 12 },
-  { id: 2, name: "Women Cotton Blue Floral Print Dress", price: 1499, origPrice: 1999, discount: 25, img: "https://byshree.com/cdn/shop/files/1_8d27ce51-a370-4bd3-952a-db28be5130aa.jpg?v=1776761572&width=600", stock: 32, buyPrice: 850, sold: 8 },
-  { id: 3, name: "Women Liva Multicolor Printed Co Ord Set", price: 2519, origPrice: 3599, discount: 30, img: "https://byshree.com/cdn/shop/files/1_97810ddc-66f2-4aa6-a213-1825b11e07f3.jpg?v=1776761396&width=600", stock: 20, buyPrice: 1600, sold: 15 },
-  { id: 4, name: "Women Liva Green Printed Co Ord Set", price: 2519, origPrice: 3599, discount: 30, img: "https://byshree.com/cdn/shop/files/1_c2c44c4c-6519-42d6-a6fc-a5f8afe65da4.jpg?v=1776761001&width=600", stock: 15, buyPrice: 1600, sold: 22 },
-  { id: 5, name: "Women Liva Yellow Floral Print Co Ord Set", price: 1999, origPrice: 2499, discount: 20, img: "https://byshree.com/cdn/shop/files/1_a2642d4d-4955-477f-9ca8-daa7e5071448.jpg?v=1776760636&width=600", stock: 28, buyPrice: 1200, sold: 30 },
-  { id: 6, name: "Women Liva Multicolor Printed Kurta Set", price: 2299, origPrice: 2799, discount: 18, img: "https://byshree.com/cdn/shop/files/3_d691b124-ae06-4d9d-a4f5-96d597b438c6.jpg?v=1776760526&width=600", stock: 10, buyPrice: 1500, sold: 18 },
-];
-
-const MOCK_ORDERS = [
-  { id: "ORD001", date: new Date().toISOString(), total: 4518, items: 2, status: "Delivered" },
-  { id: "ORD002", date: new Date(Date.now() - 86400000).toISOString(), total: 1499, items: 1, status: "Shipped" },
-  { id: "ORD003", date: new Date(Date.now() - 172800000).toISOString(), total: 2519, items: 1, status: "Processing" },
-  { id: "ORD004", date: new Date(Date.now() - 604800000).toISOString(), total: 7557, items: 3, status: "Delivered" },
-  { id: "ORD005", date: new Date(Date.now() - 2592000000).toISOString(), total: 1999, items: 1, status: "Delivered" },
+  { id: 1, name: "Women Cotton Indigo Printed Dress", price: 1499, origPrice: 1999, discount: 25, img: "https://byshree.com/cdn/shop/files/1_2010f26f-fde3-4cac-8f23-2ffb50328a27.jpg?v=1776761818&width=600", stock: 154 },
+  { id: 2, name: "Women Cotton Blue Floral Print Dress", price: 1499, origPrice: 1999, discount: 25, img: "https://byshree.com/cdn/shop/files/1_8d27ce51-a370-4bd3-952a-db28be5130aa.jpg?v=1776761572&width=600", stock: 89 },
+  { id: 3, name: "Women Liva Multicolor Printed Co Ord Set", price: 2519, origPrice: 3599, discount: 30, img: "https://byshree.com/cdn/shop/files/1_97810ddc-66f2-4aa6-a213-1825b11e07f3.jpg?v=1776761396&width=600", stock: 45 },
+  { id: 4, name: "Women Liva Green Printed Co Ord Set", price: 2519, origPrice: 3599, discount: 30, img: "https://byshree.com/cdn/shop/files/1_c2c44c4c-6519-42d6-a6fc-a5f8afe65da4.jpg?v=1776761001&width=600", stock: 67 },
+  { id: 5, name: "Women Liva Yellow Floral Print Co Ord Set", price: 1999, origPrice: 2499, discount: 20, img: "https://byshree.com/cdn/shop/files/1_a2642d4d-4955-477f-9ca8-daa7e5071448.jpg?v=1776760636&width=600", stock: 121 },
+  { id: 6, name: "Women Liva Multicolor Printed Kurta Set", price: 2299, origPrice: 2799, discount: 18, img: "https://byshree.com/cdn/shop/files/3_d691b124-ae06-4d9d-a4f5-96d597b438c6.jpg?v=1776760526&width=600", stock: 32 },
 ];
 
 export default function App() {
@@ -54,7 +49,42 @@ export default function App() {
   const [cart, setCart] = useState<{ id: number; quantity: number }[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstall = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
+
+  // Admin State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminStatsTab, setAdminStatsTab] = useState("overview"); // overview, inventory, orders
+  const [loginCreds, setLoginCreds] = useState({ username: "", password: "" });
+  const [loginError, setLoginError] = useState("");
+
+  // New Product Form State
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: "",
+    origPrice: "",
+    stock: "",
+    img: "https://byshree.com/cdn/shop/files/1_2010f26f-fde3-4cac-8f23-2ffb50328a27.jpg?v=1776761818&width=600"
+  });
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -62,15 +92,80 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleAdminLogin = (e: FormEvent) => {
+    e.preventDefault();
+    if (loginCreds.username === "ShreeHari" && loginCreds.password === "Pranshi@171") {
+      setIsAdminLoggedIn(true);
+      setShowAdminLogin(false);
+      setActiveTab("admin");
+      setLoginError("");
+    } else {
+      setLoginError("Invalid credentials. Access Denied.");
+    }
+  };
+
+  const updateProductStock = (id: number, newStock: number) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: Math.max(0, newStock) } : p));
+  };
+
+  const updateProductPrice = (id: number, newPrice: number) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, price: Math.max(0, newPrice) } : p));
+  };
+
+  const handleAddProduct = (e: FormEvent) => {
+    e.preventDefault();
+    const id = products.length + 1;
+    const price = parseInt(newProduct.price);
+    const origPrice = parseInt(newProduct.origPrice) || price;
+    const discount = origPrice > price ? Math.round(((origPrice - price) / origPrice) * 100) : 0;
+    
+    const productToAdd = {
+      id,
+      name: newProduct.name,
+      price: price,
+      origPrice: origPrice,
+      discount: discount,
+      img: newProduct.img,
+      stock: parseInt(newProduct.stock) || 0
+    };
+
+    setProducts(prev => [...prev, productToAdd]);
+    setNewProduct({ name: "", price: "", origPrice: "", stock: "", img: "https://byshree.com/cdn/shop/files/1_2010f26f-fde3-4cac-8f23-2ffb50328a27.jpg?v=1776761818&width=600" });
+    setShowAddForm(false);
+  };
+
   const toggleWishlist = (id: number) => {
     setWishlist(prev => 
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
 
+  const [stockWarning, setStockWarning] = useState<string | null>(null);
+
+  const deleteProduct = (id: number) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+    setCart(prev => prev.filter(item => item.id !== id));
+    setWishlist(prev => prev.filter(item => item !== id));
+  };
+
+  const removeFromCart = (id: number) => {
+    setCart(prev => prev.filter(item => item.id !== id));
+  };
+
   const addToCart = (id: number) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
     setCart(prev => {
       const existing = prev.find(item => item.id === id);
+      const currentQty = existing ? existing.quantity : 0;
+
+      if (currentQty >= product.stock) {
+        setStockWarning(`Only ${product.stock} units of ${product.name} are currently in stock.`);
+        setTimeout(() => setStockWarning(null), 3000);
+        return prev;
+      }
+
       if (existing) {
         return prev.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item);
       }
@@ -78,14 +173,22 @@ export default function App() {
     });
   };
 
-  const removeFromCart = (id: number) => {
-    setCart(prev => prev.filter(item => item.id !== id));
-  };
-
   const updateCartQuantity = (id: number, delta: number) => {
-    setCart(prev => prev.map(item => 
-      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-    ));
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    setCart(prev => prev.map(item => {
+      if (item.id === id) {
+        const nextQty = item.quantity + delta;
+        if (nextQty > product.stock) {
+          setStockWarning(`Maximum available stock reached for ${product.name}.`);
+          setTimeout(() => setStockWarning(null), 3000);
+          return item;
+        }
+        return { ...item, quantity: Math.max(1, nextQty) };
+      }
+      return item;
+    }));
   };
 
   const wishlistProducts = products.filter(p => wishlist.includes(p.id));
@@ -123,7 +226,7 @@ export default function App() {
             <NavLink id="nav-home" onClick={() => setActiveTab("home")} className={activeTab === 'home' ? 'text-brand border-brand' : ''}>Home</NavLink>
             <NavLink id="nav-categories" onClick={() => setActiveTab("categories")} className={activeTab === 'categories' ? 'text-brand border-brand' : ''}>Categories</NavLink>
             <NavLink id="nav-sets" onClick={() => setActiveTab("categories")}>Ethnic Sets</NavLink>
-            <NavLink id="nav-admin" onClick={() => setActiveTab("admin")} className={activeTab === 'admin' ? 'text-brand border-brand' : ''}>Admin</NavLink>
+            <NavLink id="nav-sale" className="text-sale font-bold">EOSS</NavLink>
           </nav>
 
           <div className="flex items-center gap-4 md:gap-6 text-mid">
@@ -222,10 +325,74 @@ export default function App() {
                 <li><button onClick={() => { setActiveTab("categories"); setIsMenuOpen(false); }} className="text-lg font-medium block w-full text-left border-b border-border pb-2">Categories</button></li>
                 <li><button onClick={() => { setActiveTab("wishlist"); setIsMenuOpen(false); }} className="text-lg font-medium block w-full text-left border-b border-border pb-2">My Wishlist</button></li>
                 <li><button onClick={() => { setActiveTab("cart"); setIsMenuOpen(false); }} className="text-lg font-medium block w-full text-left border-b border-border pb-2">Shopping Bag</button></li>
-                <li><button onClick={() => { setActiveTab("admin"); setIsMenuOpen(false); }} className="text-lg font-medium block w-full text-left border-b border-border pb-2 text-brand">Admin Portal</button></li>
               </ul>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Admin Login Modal */}
+      <AnimatePresence>
+        {showAdminLogin && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white w-full max-w-sm rounded-sm p-8 shadow-2xl relative"
+            >
+              <button 
+                onClick={() => setShowAdminLogin(false)}
+                className="absolute top-4 right-4 p-2 text-mid hover:text-dark"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              
+              <div className="text-center mb-8">
+                <div className="inline-flex p-3 bg-brand-light rounded-full mb-4">
+                  <Settings className="w-6 h-6 text-brand" />
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Admin Access</h3>
+                <p className="text-mid text-xs tracking-widest uppercase mt-2">Shri Hari Portal</p>
+              </div>
+
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#706050] mb-1.5 block">Username</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={loginCreds.username}
+                    onChange={(e) => setLoginCreds(prev => ({...prev, username: e.target.value}))}
+                    className="w-full bg-light border-none rounded py-3 px-4 text-sm focus:ring-2 focus:ring-brand/20 transition-all outline-none"
+                    placeholder="Enter username"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#706050] mb-1.5 block">Password</label>
+                  <input 
+                    type="password" 
+                    required
+                    value={loginCreds.password}
+                    onChange={(e) => setLoginCreds(prev => ({...prev, password: e.target.value}))}
+                    className="w-full bg-light border-none rounded py-3 px-4 text-sm focus:ring-2 focus:ring-brand/20 transition-all outline-none"
+                    placeholder="••••••••"
+                  />
+                </div>
+                {loginError && (
+                  <p className="text-sale text-[10px] font-bold italic">{loginError}</p>
+                )}
+                <button type="submit" className="w-full bg-brand text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition-all mt-6">
+                  Verify & Enter
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -265,13 +432,13 @@ export default function App() {
                     className="flex-1 grid grid-cols-2 gap-3 md:gap-4 h-[300px] md:h-[450px]"
                   >
                     <div className="col-span-2 h-[180px] md:h-[250px]">
-                      <img src={products[0]?.img} className="w-full h-full object-cover rounded-sm shadow-xl" alt="Model" />
+                      <img src={products[0].img} className="w-full h-full object-cover rounded-sm shadow-xl" alt="Model" />
                     </div>
                     <div className="h-[100px] md:h-[180px]">
-                      <img src={products[1]?.img} className="w-full h-full object-cover rounded-sm" alt="Model" />
+                      <img src={products[1].img} className="w-full h-full object-cover rounded-sm" alt="Model" />
                     </div>
                     <div className="h-[100px] md:h-[180px]">
-                      <img src={products[2]?.img} className="w-full h-full object-cover rounded-sm" alt="Model" />
+                      <img src={products[2].img} className="w-full h-full object-cover rounded-sm" alt="Model" />
                     </div>
                   </motion.div>
                 </div>
@@ -327,6 +494,65 @@ export default function App() {
                     </div>
                   </div>
               </section>
+              
+              {/* Footer */}
+              <footer className="bg-light border-t border-border pt-16 pb-8">
+                <div className="max-w-7xl mx-auto px-4 md:px-8">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                    <div className="space-y-4">
+                      <div className="flex flex-col">
+                        <span className="font-serif text-2xl font-bold text-brand tracking-tight">શ્રી હરિ</span>
+                        <span className="text-[9px] text-mid tracking-[0.2em] uppercase -mt-1 font-medium">She Is Special</span>
+                      </div>
+                      <p className="text-xs text-mid leading-relaxed">
+                        Redefining ethnic grace for the modern Indian woman. Quality, comfort, and tradition in every stitch.
+                      </p>
+                      <div className="flex items-center gap-4 text-mid">
+                        <Instagram className="w-5 h-5 hover:text-brand cursor-pointer" />
+                        <Facebook className="w-5 h-5 hover:text-brand cursor-pointer" />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest mb-6">Quick Links</h4>
+                      <ul className="space-y-3 text-xs text-mid">
+                        <li className="hover:text-brand cursor-pointer">About Us</li>
+                        <li className="hover:text-brand cursor-pointer">Contact Support</li>
+                        <li className="hover:text-brand cursor-pointer">Store Locator</li>
+                        <li className="hover:text-brand cursor-pointer">Bulk Inquiries</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest mb-6">Policies</h4>
+                      <ul className="space-y-3 text-xs text-mid">
+                        <li className="hover:text-brand cursor-pointer">Return & Exchange</li>
+                        <li className="hover:text-brand cursor-pointer">Shipping Policy</li>
+                        <li className="hover:text-brand cursor-pointer">Privacy Policy</li>
+                        <li className="hover:text-brand cursor-pointer">Terms of Service</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest mb-6">Newsletter</h4>
+                      <p className="text-xs text-mid mb-4">Stay updated with our latest ethnic releases.</p>
+                      <div className="flex overflow-hidden rounded-sm border border-border">
+                        <input type="email" placeholder="Email" className="flex-1 px-3 py-2 text-xs outline-none bg-white" />
+                        <button className="bg-brand text-white px-4 py-2 text-[10px] font-bold uppercase">Join</button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p className="text-[10px] text-mid tracking-wide">© 2026 Shri Hari Ethnic Wear. All Rights Reserved.</p>
+                    <div className="flex items-center gap-6">
+                      <span className="text-[9px] text-mid font-bold uppercase tracking-widest">Handmade In India</span>
+                      <div className="h-4 w-px bg-border"></div>
+                      <span className="text-[9px] text-mid font-bold uppercase tracking-widest cursor-pointer hover:text-brand" onClick={() => setShowAdminLogin(true)}>Admin Login</span>
+                    </div>
+                  </div>
+                </div>
+              </footer>
             </motion.div>
           )}
 
@@ -412,6 +638,20 @@ export default function App() {
                   
                   <div className="bg-light p-6 rounded-sm h-fit sticky top-32">
                     <h3 className="text-xs font-bold uppercase tracking-widest mb-6 border-b border-border pb-4">Order Summary</h3>
+                    
+                    <AnimatePresence>
+                      {stockWarning && (
+                        <motion.div 
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="bg-sale/10 border border-sale/20 p-3 rounded mb-6"
+                        >
+                          <p className="text-[10px] text-sale font-bold leading-tight">{stockWarning}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
                     <div className="space-y-3 mb-8">
                       <div className="flex justify-between text-sm">
                         <span className="text-mid">Subtotal</span>
@@ -429,6 +669,7 @@ export default function App() {
                     <button className="w-full bg-brand text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition-all">
                       Proceed To Checkout
                     </button>
+                    <p className="text-[10px] text-mid text-center mt-4">Secure payment powered by Shri Hari Enterprise</p>
                   </div>
                 </div>
               ) : (
@@ -454,7 +695,7 @@ export default function App() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {['Kurtas', 'Dresses', 'Ethnic Sets', 'Co-ords', 'Tunics', 'Bottom Wear', 'Lehengas', 'Jewellery'].map((cat, i) => (
                   <div key={cat} onClick={() => setActiveTab("home")} className="group relative aspect-square overflow-hidden rounded-sm cursor-pointer border border-border">
-                    <img src={products[i % products.length]?.img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={cat} />
+                    <img src={products[i % products.length].img} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={cat} />
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-brand/20 transition-all flex items-center justify-center">
                       <h4 className="text-white font-serif text-xl font-bold">{cat}</h4>
                     </div>
@@ -477,38 +718,312 @@ export default function App() {
                <h2 className="font-serif text-2xl font-bold mb-2">Welcome to Shri Hari</h2>
                <div className="space-y-4 text-left mt-12">
                   <button className="w-full flex items-center justify-between p-4 bg-light rounded hover:bg-brand-light transition-colors">
-                    <span className="text-sm font-bold">My Orders</span>
+                    <div className="flex items-center gap-3">
+                      <ShoppingBag className="w-4 h-4 text-brand" />
+                      <span className="text-sm font-bold">My Orders</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setShowAdminLogin(true)} className="w-full flex items-center justify-between p-4 bg-brand-light/50 border border-brand/20 rounded hover:bg-brand-light transition-colors">
+                    <div className="flex items-center gap-3">
+                      <Settings className="w-4 h-4 text-brand" />
+                      <span className="text-sm font-bold">Admin Portal</span>
+                    </div>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                   <button className="w-full flex items-center justify-between p-4 bg-light rounded hover:bg-brand-light transition-colors">
-                    <span className="text-sm font-bold">Settings</span>
+                    <span className="text-sm font-bold">Profile Settings</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
-                  <button onClick={() => setActiveTab("admin")} className="w-full flex items-center justify-between p-4 bg-brand-light/50 border border-brand/20 rounded hover:bg-brand-light transition-colors">
-                    <span className="text-sm font-bold text-brand">Admin Portal</span>
-                    <Settings className="w-4 h-4 text-brand" />
-                  </button>
                </div>
+
+               <DownloadAppSection deferredPrompt={deferredPrompt} onInstall={handleInstallClick} />
             </motion.div>
           )}
 
-          {activeTab === "admin" && (
+          {activeTab === "admin" && isAdminLoggedIn && (
             <motion.div 
               key="admin"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="py-12 md:py-24 max-w-7xl mx-auto px-4 md:px-8"
+              className="min-h-screen bg-[#f8f9fa] pt-12 pb-24 md:pt-20 px-4 md:px-8"
             >
-              {!isAdminLoggedIn ? (
-                <AdminLogin onLogin={() => setIsAdminLoggedIn(true)} />
-              ) : (
-                <AdminDashboard 
-                  products={products} 
-                  setProducts={setProducts} 
-                  orders={MOCK_ORDERS}
-                  onLogout={() => setIsAdminLoggedIn(false)}
-                />
+              <div className="max-w-7xl mx-auto">
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+                  <div>
+                    <h1 className="font-serif text-4xl font-bold text-dark mb-2">Admin Dashboard</h1>
+                    <p className="text-mid text-sm">Enterprise Resource Planning & BI Analysis</p>
+                  </div>
+                  <div className="flex items-center gap-4 bg-white p-1 rounded-full shadow-sm border border-border">
+                    {["overview", "inventory", "orders"].map((t) => (
+                      <button 
+                        key={t}
+                        onClick={() => setAdminStatsTab(t)}
+                        className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${adminStatsTab === t ? 'bg-brand text-white shadow-md' : 'text-mid hover:text-brand'}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                    <button onClick={() => setIsAdminLoggedIn(false)} className="p-2 text-sale hover:bg-sale/10 rounded-full transition-colors ml-2">
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {adminStatsTab === "overview" && (
+                  <div className="space-y-8">
+                    {/* Key Metrics */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      <MetricCard label="Total Revenue" value="₹24,82,190" change="+12.5%" isPositive icon={<TrendingUp className="w-5 h-5" />} />
+                      <MetricCard label="Total Orders" value="1,280" change="+8.2%" isPositive icon={<ShoppingBag className="w-5 h-5" />} />
+                      <MetricCard label="ROI Index" value="28.4%" change="-1.2%" isPositive={false} icon={<BarChart3 className="w-5 h-5" />} />
+                      <MetricCard label="Stock Turnover" value="4.2x" change="+0.4x" isPositive icon={<Package className="w-5 h-5" />} />
+                    </div>
+
+                    {/* Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className="bg-white p-6 rounded-sm shadow-sm border border-border">
+                        <h3 className="text-sm font-bold uppercase tracking-widest mb-8 border-b border-border pb-4 flex justify-between items-center">
+                          Revenue Trend (Weekly)
+                          <span className="text-[10px] text-mid font-normal">Last 7 Days</span>
+                        </h3>
+                        <div className="h-[300px] w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={REVENUE_DATA}>
+                              <defs>
+                                <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#8d2737" stopOpacity={0.1}/>
+                                  <stop offset="95%" stopColor="#8d2737" stopOpacity={0}/>
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#888'}} />
+                              <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#888'}} />
+                              <Tooltip />
+                              <Area type="monotone" dataKey="revenue" stroke="#8d2737" fillOpacity={1} fill="url(#colorRev)" strokeWidth={2} />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-sm shadow-sm border border-border">
+                         <h3 className="text-sm font-bold uppercase tracking-widest mb-8 border-b border-border pb-4 flex justify-between items-center">
+                          Sales Distribution
+                          <span className="text-[10px] text-mid font-normal">By Category</span>
+                        </h3>
+                        <div className="h-[300px] w-full flex items-center justify-center">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={CATEGORY_SALES}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={60}
+                                outerRadius={80}
+                                paddingAngle={5}
+                                dataKey="value"
+                              >
+                                {CATEGORY_SALES.map((_, index) => (
+                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          <div className="hidden md:block space-y-2">
+                             {CATEGORY_SALES.map((c, i) => (
+                               <div key={c.name} className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                                 <div className="w-2 h-2 rounded-full" style={{backgroundColor: COLORS[i]}}></div>
+                                 <span className="text-dark">{c.name}</span>
+                                 <span className="text-mid">{c.value}%</span>
+                               </div>
+                             ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {adminStatsTab === "inventory" && (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center bg-white p-4 rounded-sm border border-border shadow-sm">
+                       <div>
+                         <h3 className="text-sm font-bold uppercase tracking-widest">Inventory Assets</h3>
+                         <p className="text-[10px] text-mid">Showing {products.length} active SKUs</p>
+                       </div>
+                       <button 
+                        onClick={() => setShowAddForm(!showAddForm)}
+                        className="bg-brand text-white text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 rounded-sm hover:shadow-lg transition-all"
+                       >
+                         {showAddForm ? 'Cancel Entry' : 'Add New SKU'}
+                       </button>
+                    </div>
+
+                    <AnimatePresence>
+                      {showAddForm && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="bg-[#fffefe] p-6 rounded-sm border-2 border-brand/10 shadow-inner mb-8"
+                        >
+                          <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="md:col-span-2">
+                              <label className="text-[9px] font-bold uppercase text-mid mb-1 block">Product Name</label>
+                              <input 
+                                type="text" 
+                                required
+                                value={newProduct.name}
+                                onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                                className="w-full bg-light border-none rounded py-2 px-3 text-xs outline-none focus:ring-1 focus:ring-brand"
+                                placeholder="e.g. Silk Kurta Collection"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[9px] font-bold uppercase text-mid mb-1 block">Selling Price (₹)</label>
+                              <input 
+                                type="number" 
+                                required
+                                value={newProduct.price}
+                                onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                                className="w-full bg-light border-none rounded py-2 px-3 text-xs outline-none focus:ring-1 focus:ring-brand"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[9px] font-bold uppercase text-mid mb-1 block">Original Price (₹)</label>
+                              <input 
+                                type="number" 
+                                value={newProduct.origPrice}
+                                onChange={(e) => setNewProduct({...newProduct, origPrice: e.target.value})}
+                                className="w-full bg-light border-none rounded py-2 px-3 text-xs outline-none focus:ring-1 focus:ring-brand"
+                              />
+                            </div>
+                            <div className="md:col-span-2">
+                               <label className="text-[9px] font-bold uppercase text-mid mb-1 block">Image URL (Optional)</label>
+                               <input 
+                                type="text" 
+                                value={newProduct.img}
+                                onChange={(e) => setNewProduct({...newProduct, img: e.target.value})}
+                                className="w-full bg-light border-none rounded py-2 px-3 text-xs outline-none focus:ring-1 focus:ring-brand"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[9px] font-bold uppercase text-mid mb-1 block">Stock Quantity</label>
+                              <input 
+                                type="number" 
+                                required
+                                value={newProduct.stock}
+                                onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})}
+                                className="w-full bg-light border-none rounded py-2 px-3 text-xs outline-none focus:ring-1 focus:ring-brand"
+                              />
+                            </div>
+                            <div className="flex items-end">
+                              <button type="submit" className="w-full bg-dark text-white text-[10px] font-bold uppercase tracking-widest py-2.5 rounded-sm hover:bg-brand transition-colors">
+                                Add To Inventory
+                              </button>
+                            </div>
+                          </form>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="bg-white rounded-sm border border-border overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead className="bg-[#fcfaf8] border-b border-border">
+                          <tr>
+                            <th className="p-4 text-[10px] font-bold uppercase tracking-widest">Product</th>
+                            <th className="p-4 text-[10px] font-bold uppercase tracking-widest">Pricing</th>
+                            <th className="p-4 text-[10px] font-bold uppercase tracking-widest">Stock Level</th>
+                            <th className="p-4 text-[10px] font-bold uppercase tracking-widest">Status</th>
+                            <th className="p-4 text-[10px] font-bold uppercase tracking-widest">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {products.map(p => (
+                            <tr key={p.id} className="hover:bg-light transition-colors">
+                              <td className="p-4">
+                                <div className="flex items-center gap-3">
+                                  <img src={p.img} className="w-10 h-10 object-cover rounded" alt="" />
+                                  <span className="text-xs font-bold text-dark max-w-[200px] truncate">{p.name}</span>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="relative">
+                                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-mid">₹</span>
+                                    <input 
+                                      type="number"
+                                      value={p.price}
+                                      onChange={(e) => updateProductPrice(p.id, parseInt(e.target.value) || 0)}
+                                      className="w-20 bg-light border-none rounded py-1 pl-4 pr-1 text-[10px] font-bold outline-none focus:ring-1 focus:ring-brand"
+                                    />
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex flex-col gap-1">
+                                  <input 
+                                    type="number"
+                                    value={p.stock}
+                                    onChange={(e) => updateProductStock(p.id, parseInt(e.target.value) || 0)}
+                                    className="w-16 bg-light border-none rounded py-1 px-2 text-[10px] font-bold outline-none focus:ring-1 focus:ring-brand"
+                                  />
+                                  <div className="w-16 h-1 bg-border rounded-full overflow-hidden">
+                                     <div 
+                                      className={`h-full ${p.stock < 10 ? 'bg-sale' : 'bg-brand'}`} 
+                                      style={{width: `${Math.min(100, (p.stock / 200) * 100)}%`}}
+                                    ></div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-sm ${p.stock > 10 ? 'bg-green-100 text-green-700' : 'bg-sale/10 text-sale'}`}>
+                                  {p.stock > 10 ? 'In Stock' : p.stock > 0 ? 'Low Stock' : 'Out of Stock'}
+                                </span>
+                              </td>
+                              <td className="p-4">
+                                <button 
+                                  onClick={() => deleteProduct(p.id)}
+                                  className="p-2 text-mid hover:text-sale hover:bg-sale/10 rounded transition-all"
+                                  title="Delete Product"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               )}
+
+                {adminStatsTab === "orders" && (
+                   <div className="bg-white p-6 rounded-sm shadow-sm border border-border">
+                      <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-sm font-bold uppercase tracking-widest">Order Reports</h3>
+                        <div className="flex gap-2">
+                           <button className="text-[10px] font-bold px-3 py-1 bg-brand text-white rounded">Daily</button>
+                           <button className="text-[10px] font-bold px-3 py-1 bg-light text-mid rounded">Weekly</button>
+                        </div>
+                      </div>
+                      <div className="h-[400px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={ORDER_REPORTS}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#888'}} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#888'}} />
+                            <Tooltip />
+                            <Bar dataKey="orders" fill="#8d2737" radius={[4, 4, 0, 0]} barSize={20} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                   </div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -596,332 +1111,122 @@ export default function App() {
           className={`flex flex-col items-center gap-1 ${activeTab === 'profile' ? 'text-brand' : 'text-mid'}`}
         >
           <User className={`w-5 h-5 ${activeTab === 'profile' ? 'fill-current' : ''}`} />
-          <span className="text-[10px] font-bold">Profile</span>
+          <span className="text-[10px] font-bold">Account</span>
         </button>
       </div>
     </div>
   );
 }
 
-function AdminLogin({ onLogin }: { onLogin: () => void }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (username === "ShreeHari" && password === "Pranshi@171") {
-      onLogin();
-    } else {
-      setError("Invalid username or password");
-    }
-  };
+function DownloadAppSection({ deferredPrompt, onInstall }: { deferredPrompt: any; onInstall: () => void }) {
+  const sharedUrl = "https://ais-pre-hfz72gamt4enk5rhgcc5im-112470361785.asia-east1.run.app";
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-sm border border-border shadow-sm">
-      <div className="text-center mb-8">
-        <span className="font-serif text-3xl font-bold text-brand block mb-2">Admin Portal</span>
-        <p className="text-xs text-mid uppercase tracking-widest">Employee Login Only</p>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-5 text-left">
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-mid">Username</label>
-          <input 
-            type="text" 
-            className="w-full p-3 bg-light border border-border outline-none focus:border-brand transition-colors text-sm"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+    <div className="bg-brand/5 border border-brand/10 p-6 rounded-sm mt-8 text-left">
+      <h3 className="text-sm font-bold uppercase tracking-widest text-brand mb-2">Install Mobile App</h3>
+      
+      {deferredPrompt ? (
+        <div className="mb-6">
+          <p className="text-xs text-mid mb-4 leading-relaxed">
+            Click below to install Shri Hari directly on your home screen for the best experience.
+          </p>
+          <button 
+            onClick={onInstall}
+            className="w-full bg-brand text-white py-3 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition-all flex items-center justify-center gap-2"
+          >
+            Install Shri Hari App
+          </button>
         </div>
-        <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-mid">Password</label>
-          <input 
-            type="password" 
-            className="w-full p-3 bg-light border border-border outline-none focus:border-brand transition-colors text-sm"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        {error && <p className="text-sale text-xs font-medium">{error}</p>}
-        <button className="w-full bg-brand text-white py-4 font-bold uppercase tracking-widest text-xs rounded-sm hover:bg-brand-dark transition-all mt-4">
-          Authenticate
-        </button>
-      </form>
-    </div>
-  );
-}
-
-function AdminDashboard({ products, setProducts, orders, onLogout }: { products: any[]; setProducts: any; orders: any[]; onLogout: () => void }) {
-  const [activeTab, setActiveTab] = useState("products");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editPrice, setEditPrice] = useState("");
-  const [editStock, setEditStock] = useState("");
-  const [orderRange, setOrderRange] = useState("Daily");
-
-  // Reporting Calculations
-  const inventoryReport = {
-    remaining: products.reduce((sum, p) => sum + (p.stock || 0), 0),
-    sold: products.reduce((sum, p) => sum + (p.sold || 0), 0),
-    buyValue: products.reduce((sum, p) => sum + ((p.buyPrice || 0) * ((p.stock || 0) + (p.sold || 0))), 0),
-    sellValue: products.reduce((sum, p) => sum + ((p.price || 0) * (p.sold || 0)), 0),
-    totalCostOfGoodsSold: products.reduce((sum, p) => sum + ((p.buyPrice || 0) * (p.sold || 0)), 0),
-  };
-  const profitLoss = inventoryReport.sellValue - inventoryReport.totalCostOfGoodsSold;
-
-  const handleUpdate = (id: number) => {
-    setProducts((prev: any[]) => prev.map(p => 
-      p.id === id ? { ...p, price: parseInt(editPrice) || p.price, stock: parseInt(editStock) || p.stock } : p
-    ));
-    setEditingId(null);
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      setProducts((prev: any[]) => prev.filter(p => p.id !== id));
-    }
-  };
-
-  const filteredOrders = orders.filter(o => {
-    const orderDate = new Date(o.date);
-    const now = new Date();
-    if (orderRange === "Daily") return orderDate > new Date(now.setDate(now.getDate() - 1));
-    if (orderRange === "Weekly") return orderDate > new Date(now.setDate(now.getDate() - 7));
-    if (orderRange === "Monthly") return orderDate > new Date(now.setMonth(now.getMonth() - 1));
-    return true;
-  });
-
-  return (
-    <div className="text-left">
-      <div className="flex flex-col md:flex-row items-baseline justify-between mb-12 gap-4">
+      ) : (
+        <>
+          <p className="text-[10px] text-brand font-bold mb-4 break-all bg-white p-2 border border-brand/10 rounded">
+            {sharedUrl}
+          </p>
+          <p className="text-xs text-mid mb-6 leading-relaxed">
+            To use as a mobile app, copy the link above and open it in your mobile browser.
+          </p>
+        </>
+      )}
+      
+      <div className="space-y-6">
         <div>
-          <h2 className="font-serif text-3xl font-bold flex items-center gap-3">
-            <Settings className="w-8 h-8 text-brand" /> Admin Dashboard
-          </h2>
-          <p className="text-mid text-sm mt-1">Manage your store operations, inventory, and reports.</p>
+          <h4 className="text-[10px] font-bold uppercase mb-2 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-brand rounded-full"></div>
+            For Android
+          </h4>
+          <ol className="text-[10px] text-mid list-decimal list-inside space-y-1">
+            <li>Open this site in Chrome</li>
+            <li>Tap the three dots (⋮) in the top right</li>
+            <li>Select "Install app" or "Add to home screen"</li>
+          </ol>
         </div>
-        <button onClick={onLogout} className="flex items-center gap-2 text-sale font-bold text-xs uppercase tracking-widest bg-sale/5 px-4 py-2 hover:bg-sale/10 transition-all rounded-sm border border-sale/10">
-          <LogOut className="w-4 h-4" /> End Session
-        </button>
+        
+        <div>
+          <h4 className="text-[10px] font-bold uppercase mb-2 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-brand rounded-full"></div>
+            For iOS / iPhone
+          </h4>
+          <ol className="text-[10px] text-mid list-decimal list-inside space-y-1">
+            <li>Open this site in Safari</li>
+            <li>Tap the "Share" button (box with up arrow)</li>
+            <li>Scroll down and tap "Add to Home Screen"</li>
+          </ol>
+        </div>
+
+        <div className="pt-4 border-t border-brand/10">
+           <p className="text-[9px] text-mid italic">
+             Note: Progressive Web Apps (PWA) provide a native app experience without a large download.
+           </p>
+        </div>
       </div>
-
-      <div className="flex flex-wrap gap-4 mb-12 border-b border-border pb-6">
-        <button 
-          onClick={() => setActiveTab("products")}
-          className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'products' ? 'bg-brand text-white shadow-lg' : 'bg-light text-mid hover:bg-brand-light'}`}
-        >
-          <Package className="w-4 h-4" /> Products
-        </button>
-        <button 
-          onClick={() => setActiveTab("orders")}
-          className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'orders' ? 'bg-brand text-white shadow-lg' : 'bg-light text-mid hover:bg-brand-light'}`}
-        >
-          <FileText className="w-4 h-4" /> Order Details
-        </button>
-        <button 
-          onClick={() => setActiveTab("inventory")}
-          className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${activeTab === 'inventory' ? 'bg-brand text-white shadow-lg' : 'bg-light text-mid hover:bg-brand-light'}`}
-        >
-          <TrendingUp className="w-4 h-4" /> Stock & Revenue
-        </button>
-      </div>
-
-      <AnimatePresence mode="wait">
-        {activeTab === "products" && (
-          <motion.div 
-            key="p-mgmt"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <div className="flex justify-between items-center bg-light p-4 rounded-sm border border-border">
-              <span className="text-sm font-bold">{products.length} Products listed</span>
-              <button className="bg-brand text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-sm flex items-center gap-2">
-                <Plus className="w-4 h-4" /> Add New Item
-              </button>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead className="bg-light border-y border-border">
-                  <tr>
-                    <th className="p-4 text-left text-[10px] uppercase font-bold text-mid tracking-widest">Product</th>
-                    <th className="p-4 text-left text-[10px] uppercase font-bold text-mid tracking-widest">Price (₹)</th>
-                    <th className="p-4 text-left text-[10px] uppercase font-bold text-mid tracking-widest">Stock</th>
-                    <th className="p-4 text-center text-[10px] uppercase font-bold text-mid tracking-widest">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {products.map(p => (
-                    <tr key={p.id} className="hover:bg-brand-light/20">
-                      <td className="p-4">
-                        <div className="flex items-center gap-4">
-                          <img src={p.img} className="w-12 h-16 object-cover rounded-sm border border-border shadow-sm" />
-                          <span className="text-sm font-medium line-clamp-1 max-w-[200px]">{p.name}</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        {editingId === p.id ? (
-                          <input 
-                            type="number" 
-                            className="w-24 p-1 border border-brand outline-none text-sm" 
-                            value={editPrice}
-                            placeholder={p.price.toString()}
-                            onChange={(e) => setEditPrice(e.target.value)}
-                          />
-                        ) : (
-                          <span className="text-sm font-bold">₹{p.price}</span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        {editingId === p.id ? (
-                          <input 
-                            type="number" 
-                            className="w-20 p-1 border border-brand outline-none text-sm" 
-                            value={editStock}
-                            placeholder={p.stock.toString()}
-                            onChange={(e) => setEditStock(e.target.value)}
-                          />
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <span className={`text-sm font-bold ${p.stock < 15 ? 'text-sale' : ''}`}>{p.stock}</span>
-                            {p.stock < 15 && <span className="bg-sale/10 text-sale text-[8px] font-bold px-1 rounded uppercase tracking-tighter">Low</span>}
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-3">
-                          {editingId === p.id ? (
-                            <button onClick={() => handleUpdate(p.id)} className="text-brand font-bold text-[10px] uppercase underline">Save</button>
-                          ) : (
-                            <button onClick={() => { setEditingId(p.id); setEditPrice(p.price.toString()); setEditStock(p.stock.toString()); }} className="text-mid hover:text-brand transition-colors"><BarChart2 className="w-4 h-4" /></button>
-                          )}
-                          <button onClick={() => handleDelete(p.id)} className="text-mid hover:text-sale transition-colors"><Trash2 className="w-4 h-4" /></button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === "orders" && (
-          <motion.div 
-            key="o-mgmt"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <div className="flex flex-col sm:flex-row justify-between items-center bg-light p-6 rounded-sm border border-border gap-6">
-              <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-brand" />
-                <h3 className="font-bold">Order Details & Tracking</h3>
-              </div>
-              <div className="flex bg-white rounded-full p-1 border border-border shadow-sm">
-                {["Daily", "Weekly", "Monthly"].map(range => (
-                  <button 
-                    key={range}
-                    onClick={() => setOrderRange(range)}
-                    className={`px-5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${orderRange === range ? 'bg-brand text-white' : 'text-mid hover:bg-brand-light'}`}
-                  >
-                    {range}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              {filteredOrders.length > 0 ? filteredOrders.map(o => (
-                <div key={o.id} className="bg-white border border-border p-4 rounded-sm flex items-center justify-between hover:border-brand transition-all shadow-sm">
-                  <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 bg-light rounded-full flex items-center justify-center font-bold text-brand text-[10px]">#ORD</div>
-                    <div className="text-left">
-                      <span className="text-[10px] font-bold text-mid block uppercase tracking-tighter">{o.id}</span>
-                      <span className="text-xs text-mid">{new Date(o.date).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-12 items-center">
-                    <div className="text-right">
-                      <span className="text-[10px] font-bold text-mid block uppercase tracking-tighter">Amount</span>
-                      <span className="text-sm font-bold">₹{o.total}</span>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${o.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-brand-light text-brand'}`}>
-                      {o.status}
-                    </span>
-                  </div>
-                </div>
-              )) : (
-                <div className="py-20 text-center border-2 border-dashed border-border rounded-sm text-mid italic">No orders found for this period.</div>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {activeTab === "inventory" && (
-          <motion.div 
-            key="i-mgmt"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <ReportStat label="Stock Remaining" value={inventoryReport.remaining} icon={<Package className="w-5 h-5" />} />
-              <ReportStat label="Units Sold" value={inventoryReport.sold} icon={<TrendingUp className="w-5 h-5" />} />
-              <ReportStat label="Total Buy Value" value={`₹${inventoryReport.buyValue.toLocaleString()}`} icon={<ShoppingBag className="w-5 h-5" />} />
-              <ReportStat label="Gross Sell Value" value={`₹${inventoryReport.sellValue.toLocaleString()}`} icon={<BarChart2 className="w-5 h-5" />} />
-              <ReportStat 
-                label={profitLoss >= 0 ? "Potential Profit" : "Current Loss"} 
-                value={`₹${Math.abs(profitLoss).toLocaleString()}`} 
-                color={profitLoss >= 0 ? "text-green-600" : "text-sale"}
-                icon={<TrendingUp className={`w-5 h-5 ${profitLoss >= 0 ? 'text-green-600' : 'text-sale'}`} />}
-              />
-            </div>
-
-            <div className="bg-dark p-8 rounded-sm text-white shadow-2xl relative overflow-hidden">
-               <div className="absolute top-0 right-0 p-12 opacity-10 rotate-12"><TrendingUp className="w-40 h-40" /></div>
-               <div className="relative z-10">
-                 <h3 className="text-xs font-bold uppercase tracking-[.3em] text-gold mb-8">Performance Summary</h3>
-                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div>
-                      <span className="text-[10px] text-[#a09080] block mb-2 font-bold uppercase">ROI Estimated</span>
-                      <span className="text-2xl font-serif font-bold text-white">{((profitLoss / inventoryReport.buyValue) * 100).toFixed(1)}%</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-[#a09080] block mb-2 font-bold uppercase">Inventory Turnover</span>
-                      <span className="text-2xl font-serif font-bold text-white">{(inventoryReport.sold / products.length).toFixed(1)}x</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-[#a09080] block mb-2 font-bold uppercase">Average Order Value</span>
-                      <span className="text-2xl font-serif font-bold text-white">₹{(inventoryReport.sellValue / inventoryReport.sold).toFixed(0)}</span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-[#a09080] block mb-2 font-bold uppercase">Total Revenue</span>
-                      <span className="text-2xl font-serif font-bold text-gold">₹{inventoryReport.sellValue.toLocaleString()}</span>
-                    </div>
-                 </div>
-               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
 
-function ReportStat({ label, value, icon, color = "text-dark" }: { label: string; value: any; icon: React.ReactNode; color?: string }) {
+function MetricCard({ label, value, change, isPositive, icon }: { label: string; value: string; change: string; isPositive: boolean; icon: ReactNode }) {
   return (
-    <div className="bg-white border border-border p-6 rounded-sm shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-light rounded text-mid">{icon}</div>
-        <span className="text-[10px] font-bold text-mid uppercase tracking-widest">{label}</span>
+    <div className="bg-white p-6 rounded-sm shadow-sm border border-border">
+      <div className="flex items-center justify-between mb-4">
+        <div className="p-2 bg-light rounded text-brand">{icon}</div>
+        <div className={`flex items-center gap-1 text-[10px] font-bold ${isPositive ? 'text-green-600' : 'text-sale'}`}>
+          {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+          {change}
+        </div>
       </div>
-      <span className={`text-2xl font-serif font-bold ${color}`}>{value}</span>
+      <h4 className="text-[10px] font-bold uppercase tracking-widest text-mid mb-1">{label}</h4>
+      <div className="text-2xl font-bold text-dark">{value}</div>
     </div>
   );
 }
 
-function NavLink({ children, className = "", id, onClick }: { children: React.ReactNode; className?: string; id?: string; onClick?: (e: MouseEvent) => void }) {
+// Analytics Mock Data
+const REVENUE_DATA = [
+  { name: 'Mon', revenue: 145000 },
+  { name: 'Tue', revenue: 168000 },
+  { name: 'Wed', revenue: 152000 },
+  { name: 'Thu', revenue: 190000 },
+  { name: 'Fri', revenue: 210000 },
+  { name: 'Sat', revenue: 280000 },
+  { name: 'Sun', revenue: 245000 },
+];
+
+const CATEGORY_SALES = [
+  { name: 'Kurtas', value: 45 },
+  { name: 'Dresses', value: 30 },
+  { name: 'Co-ords', value: 15 },
+  { name: 'Sets', value: 10 },
+];
+
+const ORDER_REPORTS = [
+  { name: 'Festive', orders: 450 },
+  { name: 'Daily', orders: 320 },
+  { name: 'Glam', orders: 120 },
+  { name: 'Spirit', orders: 390 },
+];
+
+const COLORS = ['#8d2737', '#2d3436', '#d4c4b0', '#a29bfe'];
+
+function NavLink({ children, className = "", id, onClick }: { children: ReactNode; className?: string; id?: string; onClick?: (e: MouseEvent) => void }) {
   return (
     <button 
       id={id}
@@ -933,7 +1238,15 @@ function NavLink({ children, className = "", id, onClick }: { children: React.Re
   );
 }
 
-function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart }: { key?: any; product: any; isWishlisted: boolean; onToggleWishlist: (id: number) => void; onAddToCart: () => void }) {
+interface ProductCardProps {
+  key?: any;
+  product: any;
+  isWishlisted: boolean;
+  onToggleWishlist: (id: number) => void;
+  onAddToCart: () => void;
+}
+
+function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart }: ProductCardProps) {
   return (
     <motion.div 
       whileHover={{ y: -5 }}
