@@ -72,9 +72,15 @@ export default function App() {
   // Admin State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [adminStatsTab, setAdminStatsTab] = useState("overview"); // overview, inventory, orders
+  const [adminStatsTab, setAdminStatsTab] = useState("overview"); // overview, inventory, orders, settings
   const [loginCreds, setLoginCreds] = useState({ username: "", password: "" });
   const [loginError, setLoginError] = useState("");
+
+  // Payment Config
+  const [paymentConfig, setPaymentConfig] = useState({
+    whatsappNumber: "919016171717",
+    gpayUpiId: "shrihari.wear@ybl"
+  });
 
   // New Product Form State
   const [newProduct, setNewProduct] = useState({
@@ -217,8 +223,8 @@ export default function App() {
               <Menu className="w-6 h-6 text-dark" />
             </button>
             <div className="flex flex-col cursor-pointer" onClick={() => setActiveTab("home")}>
-              <span className="font-serif text-xl md:text-2xl font-bold text-brand tracking-tight">શ્રી હરિ</span>
-              <span className="text-[8px] md:text-[9px] text-mid tracking-[0.2em] uppercase -mt-1 font-medium">She Is Special</span>
+              <span className="font-artistic text-xl md:text-3xl font-black text-brand tracking-tight drop-shadow-sm">શ્રી હરિ</span>
+              <span className="text-[8px] md:text-[10px] text-mid tracking-[0.25em] uppercase font-bold bg-brand/5 px-2 py-0.5 rounded-full mt-0.5">Miracle Within</span>
             </div>
           </div>
 
@@ -317,7 +323,7 @@ export default function App() {
               className="fixed inset-y-0 left-0 w-[80%] max-w-xs bg-white z-[70] shadow-2xl p-6"
             >
               <div className="flex items-center justify-between mb-8">
-                <span className="font-serif text-xl font-bold text-brand">શ્રી હરિ</span>
+                <span className="font-artistic text-2xl font-black text-brand">શ્રી હરિ</span>
                 <button onClick={() => setIsMenuOpen(false)}><X className="w-6 h-6" /></button>
               </div>
               <ul className="space-y-6">
@@ -501,8 +507,8 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                     <div className="space-y-4">
                       <div className="flex flex-col">
-                        <span className="font-serif text-2xl font-bold text-brand tracking-tight">શ્રી હરિ</span>
-                        <span className="text-[9px] text-mid tracking-[0.2em] uppercase -mt-1 font-medium">She Is Special</span>
+                        <span className="font-artistic text-3xl font-black text-brand tracking-tight">શ્રી હરિ</span>
+                        <span className="text-[10px] text-mid tracking-[0.2em] uppercase font-bold">Miracle Within</span>
                       </div>
                       <p className="text-xs text-mid leading-relaxed">
                         Redefining ethnic grace for the modern Indian woman. Quality, comfort, and tradition in every stitch.
@@ -666,9 +672,32 @@ export default function App() {
                         <span className="font-bold text-xl text-brand">₹{cartTotal}</span>
                       </div>
                     </div>
-                    <button className="w-full bg-brand text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition-all">
-                      Proceed To Checkout
-                    </button>
+                    
+                    <div className="space-y-3">
+                      <button 
+                        onClick={() => {
+                          const message = `Halo Shri Hari! I want to order:\n${cartProducts.map(p => `- ${p.name} (Qty: ${p.quantity})`).join('\n')}\nTotal: ₹${cartTotal}`;
+                          window.open(`https://wa.me/${paymentConfig.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                        }}
+                        className="w-full bg-[#25D366] text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Instagram className="w-4 h-4" /> {/* Swap with MessageSquare if preferred */}
+                        Pay Via WhatsApp
+                      </button>
+                      
+                      <button 
+                        onClick={() => {
+                          // Standard UPI Intent URL
+                          const upiUrl = `upi://pay?pa=${paymentConfig.gpayUpiId}&pn=Shri%20Hari%20Ethnic&am=${cartTotal}&cu=INR`;
+                          window.open(upiUrl, '_blank');
+                        }}
+                        className="w-full bg-dark text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition-all flex items-center justify-center gap-2"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        Google Pay / UPI
+                      </button>
+                    </div>
+
                     <p className="text-[10px] text-mid text-center mt-4">Secure payment powered by Shri Hari Enterprise</p>
                   </div>
                 </div>
@@ -755,7 +784,7 @@ export default function App() {
                     <p className="text-mid text-sm">Enterprise Resource Planning & BI Analysis</p>
                   </div>
                   <div className="flex items-center gap-4 bg-white p-1 rounded-full shadow-sm border border-border">
-                    {["overview", "inventory", "orders"].map((t) => (
+                    {["overview", "inventory", "orders", "settings"].map((t) => (
                       <button 
                         key={t}
                         onClick={() => setAdminStatsTab(t)}
@@ -1023,6 +1052,69 @@ export default function App() {
                       </div>
                    </div>
                 )}
+
+                {adminStatsTab === "settings" && (
+                   <div className="max-w-2xl bg-white p-8 rounded-sm shadow-sm border border-border">
+                      <h3 className="text-sm font-bold uppercase tracking-widest mb-8 border-b border-border pb-4 flex items-center gap-2">
+                        <Settings className="w-4 h-4 text-brand" />
+                        Application Settings
+                      </h3>
+                      
+                      <div className="space-y-8">
+                        <div>
+                          <h4 className="text-[11px] font-bold uppercase mb-4 text-brand">Payment Gateway Config</h4>
+                          <div className="grid grid-cols-1 gap-6">
+                            <div>
+                              <label className="text-[9px] font-bold uppercase text-mid mb-1.5 block">WhatsApp Business Number (with country code)</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-mid">+</span>
+                                <input 
+                                  type="text" 
+                                  value={paymentConfig.whatsappNumber}
+                                  onChange={(e) => setPaymentConfig({...paymentConfig, whatsappNumber: e.target.value.replace(/\D/g, '')})}
+                                  className="w-full bg-light border-none rounded py-3 pl-8 pr-4 text-xs font-mono outline-none focus:ring-1 focus:ring-brand"
+                                  placeholder="919016171717"
+                                />
+                              </div>
+                              <p className="text-[9px] text-mid mt-2 italic">Standard messages will be sent to this number upon order.</p>
+                            </div>
+
+                            <div>
+                              <label className="text-[9px] font-bold uppercase text-mid mb-1.5 block">Google Pay / Merchant UPI ID</label>
+                              <input 
+                                type="text" 
+                                value={paymentConfig.gpayUpiId}
+                                onChange={(e) => setPaymentConfig({...paymentConfig, gpayUpiId: e.target.value})}
+                                className="w-full bg-light border-none rounded py-3 px-4 text-xs font-mono outline-none focus:ring-1 focus:ring-brand"
+                                placeholder="merchant@upi"
+                              />
+                              <p className="text-[9px] text-mid mt-2 italic">Direct UPI intent will be triggered on mobile checkout.</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-8 border-t border-border">
+                          <h4 className="text-[11px] font-bold uppercase mb-4 text-brand">Branding</h4>
+                          <div className="p-4 bg-light rounded text-[11px] text-mid">
+                             <div className="flex justify-between items-center mb-2">
+                               <span>Tagline:</span>
+                               <span className="font-bold text-dark">Miracle Within</span>
+                             </div>
+                             <div className="flex justify-between items-center">
+                               <span>Logo Font:</span>
+                               <span className="font-bold text-dark">Cinzel Decorative</span>
+                             </div>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-4">
+                           <button className="bg-brand text-white px-8 py-3 rounded-sm text-[10px] font-bold uppercase tracking-widest shadow-lg hover:shadow-brand/20 transition-all">
+                             Save Configuration
+                           </button>
+                        </div>
+                      </div>
+                   </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -1033,9 +1125,9 @@ export default function App() {
       <footer className="bg-dark text-[#a09080] pt-16 pb-20 md:pb-8">
         <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="md:col-span-2">
-            <span className="font-serif text-2xl font-bold text-white mb-4 block">શ્રી હરિ</span>
+            <span className="font-artistic text-3xl font-black text-white mb-4 block underline decoration-brand decoration-4 underline-offset-8">શ્રી હરિ</span>
             <p className="text-sm leading-relaxed max-w-sm mb-6">
-              Shri Hari — She Is Special. Celebrating Indian women through exquisite ethnic wear since our founding. Present in 5 countries.
+              Shri Hari — Miracle Within. Celebrating Indian women through exquisite ethnic wear since our founding. Present in 5 countries.
             </p>
             <div className="flex gap-4">
               <a href="#" className="bg-white/10 p-2 rounded-full hover:bg-brand transition-colors"><Instagram className="w-5 h-5 text-white" /></a>
