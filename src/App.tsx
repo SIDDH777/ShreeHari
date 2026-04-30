@@ -14,6 +14,7 @@ import {
   ChevronRight, 
   Instagram, 
   Facebook, 
+  Download,
   Home,
   Grid,
   Settings,
@@ -1241,6 +1242,24 @@ function DownloadAppSection({ deferredPrompt, onInstall }: { deferredPrompt: any
       )}
       
       <div className="space-y-6">
+        <div>
+          <h4 className="text-[10px] font-bold uppercase mb-4 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-brand rounded-full"></div>
+            Portable Standalone Version
+          </h4>
+          <a 
+            href="/ShreeHari.html" 
+            download="ShreeHari.html"
+            className="inline-flex items-center gap-2 bg-dark text-white px-4 py-2 rounded-sm text-[10px] font-bold uppercase tracking-widest hover:bg-brand transition-all"
+          >
+            <Download className="w-3 h-3" />
+            Download ShreeHari.html
+          </a>
+          <p className="text-[9px] text-mid mt-2 leading-relaxed">
+            Download a single file containing the entire shop. Works offline and can be shared via WhatsApp.
+          </p>
+        </div>
+
         <div>
           <h4 className="text-[10px] font-bold uppercase mb-2 flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-brand rounded-full"></div>

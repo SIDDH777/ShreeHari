@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shri Hari Ethnic Wear | Miracle Within</title>
+    
+    <!-- External Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=Cinzel+Decorative:wght@400;700;900&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#b5451b',
+                        'brand-dark': '#8d2737',
+                        light: '#fcfaf7',
+                        dark: '#1a1816',
+                        mid: '#6b6661',
+                        border: '#e8e4e0',
+                    },
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        artistic: ['Cinzel Decorative', 'serif'],
+                        script: ['Dancing Script', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'DM Sans', sans-serif; background-color: #fcfaf7; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { motion, AnimatePresence } = FramerMotion;
+
+        // Custom Lucide Icon Component for Standalone
+        const Icon = ({ name, className, size = 20 }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        const PRODUCTS = [
+            { id: 1, name: "Regal Velvet Anarkali", category: "New Arrivals", price: 4500, image: "https://images.unsplash.com/photo-1583391733956-6c78276477e2?auto=format&fit=crop&q=80&w=800", rating: 4.8 },
+            { id: 2, name: "Pristine Chikankari Kurta", category: "Kurtas", price: 2200, image: "https://images.unsplash.com/photo-1610030469614-2c7104f32386?auto=format&fit=crop&q=80&w=800", rating: 4.9 },
+            { id: 3, name: "Sapphire Silk Saree", category: "Sarees", price: 5800, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&q=80&w=800", rating: 4.7 },
+            { id: 4, name: "Floral Organza Suit", category: "New Arrivals", price: 3200, image: "https://images.unsplash.com/photo-1617175548993-e70ab79943fc?auto=format&fit=crop&q=80&w=800", rating: 4.6 },
+            { id: 5, name: "Banarasi Heritage Jutti", category: "Accessories", price: 1200, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800", rating: 5.0 },
+            { id: 6, name: "Zari Work Lehanga", category: "Festive", price: 8500, image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&q=80&w=800", rating: 4.9 },
+        ];
+
+        function App() {
+            const [activeTab, setActiveTab] = useState("home");
+            const [cart, setCart] = useState([]);
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+            const [showAdminLogin, setShowAdminLogin] = useState(false);
+            const [paymentConfig, setPaymentConfig] = useState({
+                whatsappNumber: "919016171717",
+                gpayUpiId: "shrihari.wear@ybl"
+            });
+
+            const addToCart = (product) => {
+                setCart(prev => {
+                    const existing = prev.find(item => item.id === product.id);
+                    if (existing) {
+                        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+                    }
+                    return [...prev, { ...product, quantity: 1 }];
+                });
+            };
+
+            const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            return (
+                <div className="min-h-screen bg-light">
+                    {/* Artistic Header */}
+                    <header className="sticky top-0 z-50 glass border-b border-border px-4 py-3">
+                        <div className="max-w-7xl mx-auto flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <button onClick={() => setIsMenuOpen(true)} className="p-1"><Icon name="menu" className="text-dark" /></button>
+                                <div className="flex flex-col cursor-pointer" onClick={() => setActiveTab("home")}>
+                                    <span className="font-artistic text-xl md:text-3xl font-black text-brand tracking-tight">શ્રી હરિ</span>
+                                    <span className="text-[8px] md:text-[10px] text-mid tracking-[0.25em] uppercase font-bold bg-brand/5 px-2 py-0.5 rounded-full mt-0.5">Miracle Within</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-5">
+                                <Icon name="search" className="text-dark cursor-pointer" />
+                                <div className="relative cursor-pointer" onClick={() => setActiveTab("cart")}>
+                                    <Icon name="shopping-bag" className="text-dark" />
+                                    {cart.length > 0 && (
+                                        <span className="absolute -top-1.5 -right-1.5 bg-brand text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                                            {cart.reduce((a, b) => a + b.quantity, 0)}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation Menu (Mobile Drawer) */}
+                    <AnimatePresence>
+                        {isMenuOpen && (
+                            <>
+                                <motion.div 
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="fixed inset-0 bg-dark/60 z-[60]"
+                                />
+                                <motion.div 
+                                    initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
+                                    className="fixed inset-y-0 left-0 w-[80%] max-w-xs bg-white z-[70] p-6 shadow-2xl"
+                                >
+                                    <div className="flex items-center justify-between mb-8">
+                                        <span className="font-artistic text-2xl font-black text-brand">શ્રી હરિ</span>
+                                        <button onClick={() => setIsMenuOpen(false)}><Icon name="x" /></button>
+                                    </div>
+                                    <ul className="space-y-6">
+                                        {["Home", "Shop", "New Arrivals", "Best Sellers", "About"].map(item => (
+                                            <li key={item} 
+                                                onClick={() => { setActiveTab(item.toLowerCase()); setIsMenuOpen(false); }}
+                                                className="text-xs font-bold uppercase tracking-[0.2em] text-dark cursor-pointer hover:text-brand"
+                                            >
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Content Router */}
+                    <main className="pb-24">
+                        {activeTab === "home" && <HomeView addToCart={addToCart} setActiveTab={setActiveTab} />}
+                        {activeTab === "shop" && <ShopView addToCart={addToCart} />}
+                        {activeTab === "cart" && <CartView cart={cart} total={cartTotal} config={paymentConfig} />}
+                        {activeTab === "account" && <AccountView total={cartTotal} />}
+                    </main>
+
+                    {/* Bottom Nav */}
+                    <nav className="fixed bottom-0 inset-x-0 glass border-t border-border px-6 py-3 z-50">
+                        <div className="max-w-md mx-auto flex items-center justify-between">
+                            <NavItem icon="home" label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+                            <NavItem icon="shopping-basket" label="Shop" active={activeTab === 'shop'} onClick={() => setActiveTab('shop')} />
+                            <NavItem icon="heart" label="Wishlist" active={activeTab === 'wishlist'} onClick={() => setActiveTab('wishlist')} />
+                            <NavItem icon="user" label="Account" active={activeTab === 'account'} onClick={() => setActiveTab('account')} />
+                        </div>
+                    </nav>
+                </div>
+            );
+        }
+
+        const NavItem = ({ icon, label, active, onClick }) => (
+            <button onClick={onClick} className={`flex flex-col items-center gap-1 ${active ? 'text-brand' : 'text-mid'}`}>
+                <Icon name={icon} className={active ? 'fill-current' : ''} size={20} />
+                <span className="text-[10px] font-bold uppercase tracking-tighter">{label}</span>
+            </button>
+        );
+
+        function HomeView({ addToCart, setActiveTab }) {
+            return (
+                <div className="animate-fade-in">
+                    {/* Hero */}
+                    <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=2000" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-brand/10 bg-gradient-to-t from-dark/60 via-transparent"></div>
+                        <div className="relative text-center px-6">
+                            <motion.h1 initial={{ y: 20 }} animate={{ y: 0 }} className="text-white font-serif text-5xl md:text-7xl mb-4 italic">The Festive Aura</motion.h1>
+                            <p className="text-white/90 text-sm tracking-[0.3em] uppercase mb-8 font-light">Celebrating Traditions Since 1994</p>
+                            <button onClick={() => setActiveTab('shop')} className="bg-white text-dark px-10 py-3 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand hover:text-white transition-all">Explore Collection</button>
+                        </div>
+                    </section>
+
+                    {/* Featured Products */}
+                    <section className="px-4 py-20 max-w-7xl mx-auto">
+                        <div className="flex flex-col items-center mb-16 text-center">
+                            <span className="text-[10px] text-brand font-bold uppercase tracking-[0.4em] mb-4">Crafted With Love</span>
+                            <h2 className="text-3xl font-serif italic text-dark">Luxury Collections</h2>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-12">
+                            {PRODUCTS.map(p => (
+                                <ProductCard key={p.id} product={p} onAdd={() => addToCart(p)} />
+                            ))}
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        function ProductCard({ product, onAdd }) {
+            return (
+                <div className="group cursor-pointer">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-4 rounded-sm bg-border">
+                        <img src={product.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" title={product.name} />
+                        <button onClick={(e) => { e.stopPropagation(); onAdd(); }} className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md text-dark py-3 rounded-sm text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all shadow-xl">Quick Buy</button>
+                    </div>
+                    <div className="space-y-1">
+                        <span className="text-[9px] text-brand font-bold uppercase tracking-widest">{product.category}</span>
+                        <h3 className="text-xs text-dark font-medium leading-snug">{product.name}</h3>
+                        <p className="text-xs font-bold text-dark">₹{product.price}</p>
+                    </div>
+                </div>
+            );
+        }
+
+        function CartView({ cart, total, config }) {
+            return (
+                <div className="px-6 pt-10 max-w-md mx-auto animate-slide-up">
+                    <h2 className="text-xl font-serif italic mb-8 border-b pb-4">Shopping Bag ({cart.length})</h2>
+                    {cart.length === 0 ? (
+                        <div className="py-20 text-center">
+                            <Icon name="shopping-bag" className="mx-auto text-border mb-4" size={48} />
+                            <p className="text-mid text-xs uppercase tracking-widest">Your bag is empty</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {cart.map(item => (
+                                <div key={item.id} className="flex gap-4">
+                                    <img src={item.image} className="w-20 h-24 object-cover rounded-sm" />
+                                    <div className="flex-1">
+                                        <h3 className="text-xs font-bold uppercase tracking-wider">{item.name}</h3>
+                                        <p className="text-[10px] text-mid mt-1">Qty: {item.quantity}</p>
+                                        <p className="text-xs font-bold mt-2">₹{item.price * item.quantity}</p>
+                                    </div>
+                                </div>
+                            ))}
+                            <div className="pt-6 border-t border-border">
+                                <div className="flex justify-between mb-8">
+                                    <span className="text-xs font-bold uppercase">Estimated Total</span>
+                                    <span className="text-lg font-bold text-brand">₹{total}</span>
+                                </div>
+                                <div className="space-y-3">
+                                    <button 
+                                        onClick={() => window.open(`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(`Order: ${cart.map(i => `${i.name} (x${i.quantity})`).join(', ')}\nTotal: ₹${total}`)}`, '_blank')}
+                                        className="w-full bg-[#25D366] text-white py-4 rounded-sm text-xs font-bold uppercase flex items-center justify-center gap-2"
+                                    >
+                                        Pay Via WhatsApp
+                                    </button>
+                                    <button 
+                                        onClick={() => window.open(`upi://pay?pa=${config.gpayUpiId}&pn=Shri%20Hari&am=${total}&cu=INR`, '_blank')}
+                                        className="w-full bg-dark text-white py-4 rounded-sm text-xs font-bold uppercase flex items-center justify-center gap-2"
+                                    >
+                                        Google Pay / UPI
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function ShopView({ addToCart }) {
+            return (
+                <div className="px-4 pt-10 animate-fade-in">
+                    <div className="flex items-center gap-4 mb-8 overflow-x-auto hide-scrollbar text-[10px] uppercase font-bold tracking-widest whitespace-nowrap">
+                        {["All", "Kurtas", "Sarees", "New Arrivals", "Accessories"].map(cat => (
+                            <button key={cat} className="bg-white border px-4 py-2 rounded-full hover:bg-brand hover:text-white transition-colors">{cat}</button>
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-12">
+                        {PRODUCTS.map(p => (
+                            <ProductCard key={p.id} product={p} onAdd={() => addToCart(p)} />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function AccountView({ total }) {
+            return (
+                <div className="px-6 pt-10 max-w-md mx-auto">
+                    <div className="p-8 bg-brand-dark text-white rounded-sm mb-8 text-center">
+                        <div className="w-16 h-16 bg-white/20 rounded-full mx-auto flex items-center justify-center mb-4">
+                            <Icon name="user" size={32} />
+                        </div>
+                        <h3 className="font-serif italic text-xl">Welcome to Shri Hari</h3>
+                        <p className="text-[10px] uppercase tracking-widest text-white/70 mt-1">Miracle Within</p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="p-4 bg-white border border-border rounded-sm flex items-center justify-between cursor-pointer">
+                            <div className="flex items-center gap-3">
+                                <Icon name="package" className="text-brand" />
+                                <span className="text-xs font-bold uppercase tracking-widest">My Orders</span>
+                            </div>
+                            <Icon name="chevron-right" size={16} />
+                        </div>
+                        <div className="p-4 bg-white border border-border rounded-sm flex items-center justify-between cursor-pointer">
+                            <div className="flex items-center gap-3">
+                                <Icon name="settings" className="text-brand" />
+                                <span className="text-xs font-bold uppercase tracking-widest">Settings</span>
+                            </div>
+                            <Icon name="chevron-right" size={16} />
+                        </div>
+                    </div>
+
+                    {/* Download Section */}
+                    <div className="bg-brand/5 border border-brand/10 p-6 rounded-sm mt-12">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-brand mb-4">Download Offline App</h3>
+                        <p className="text-[10px] text-mid mb-6 leading-relaxed">
+                            Take this website with you. Open this file in your mobile browser and select "Add to Home Screen" to install Shri Hari as a mobile app.
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
