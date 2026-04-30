@@ -24,7 +24,9 @@ import {
   LogOut,
   ChevronDown,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  MessageSquare,
+  Zap
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -220,12 +222,16 @@ export default function App() {
       <header className={`sticky top-0 z-50 transition-all duration-300 bg-white ${scrolled ? 'shadow-md py-2' : 'border-b border-border py-4'}`}>
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button className="md:hidden" onClick={() => setIsMenuOpen(true)}>
+            <button className="md:hidden p-2 hover:bg-brand/5 rounded-full transition-colors" onClick={() => setIsMenuOpen(true)}>
               <Menu className="w-6 h-6 text-dark" />
             </button>
-            <div className="flex flex-col cursor-pointer" onClick={() => setActiveTab("home")}>
-              <span className="font-artistic text-xl md:text-3xl font-black text-brand tracking-tight drop-shadow-sm">શ્રી હરિ</span>
-              <span className="text-[8px] md:text-[10px] text-mid tracking-[0.25em] uppercase font-bold bg-brand/5 px-2 py-0.5 rounded-full mt-0.5">Miracle Within</span>
+            <div className="flex flex-col cursor-pointer group" onClick={() => setActiveTab("home")}>
+              <span className="font-artistic text-xl md:text-3xl font-black text-brand tracking-tight drop-shadow-sm transition-transform group-hover:scale-105">શ્રી હરિ</span>
+              <div className="flex items-center gap-2 overflow-hidden">
+                <span className="h-px bg-brand/20 flex-1"></span>
+                <span className="text-[7px] md:text-[9px] text-brand/60 tracking-[0.3em] uppercase font-bold whitespace-nowrap">Miracle Within</span>
+                <span className="h-px bg-brand/20 flex-1"></span>
+              </div>
             </div>
           </div>
 
@@ -412,44 +418,70 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
             >
-              {/* Hero Section */}
-              <section className="relative overflow-hidden bg-gradient-to-br from-brand-light via-[#f0e0d0] to-[#e8d0be] py-12 md:py-20">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-12">
+              <motion.section 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="relative overflow-hidden bg-[#faf7f2] py-16 md:py-32"
+              >
+                <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-16">
                   <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex-1 text-center md:text-left"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="flex-1 text-center md:text-left z-10"
                   >
-                    <span className="text-[10px] md:text-xs font-bold tracking-[0.3em] text-brand uppercase mb-4 block">New Collection - Spring 2026</span>
-                    <h1 className="font-serif text-4xl md:text-6xl font-bold text-dark leading-[1.1] mb-6">
-                      Celebrate Your <br />
-                      <span className="text-brand">Ethnic</span> Grace
+                    <motion.span 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-[10px] md:text-xs font-black tracking-[0.4em] text-brand uppercase mb-6 block border-l-2 border-brand pl-4"
+                    >
+                      Premium Ethnic Selection — 2026
+                    </motion.span>
+                    <h1 className="font-serif text-5xl md:text-8xl font-bold text-dark leading-[0.9] mb-8 tracking-tighter">
+                      The Art Of <br />
+                      <span className="text-brand italic font-medium">Bespoke</span> Grace
                     </h1>
-                    <p className="text-mid text-base md:text-lg mb-8 max-w-md mx-auto md:mx-0">
-                      Handcrafted ethnic wear that honours tradition with a modern touch. For every Indian woman, every occasion.
+                    <p className="text-mid text-base md:text-xl mb-12 max-w-sm mx-auto md:mx-0 leading-relaxed font-light">
+                      Meticulously handcrafted ensembles that bridge heritage and modernity.
                     </p>
-                    <button onClick={() => setActiveTab("categories")} className="bg-brand text-white px-8 py-4 rounded-sm text-sm font-bold tracking-widest uppercase hover:bg-brand-dark transition-all transform hover:-translate-y-1 shadow-lg shadow-brand/20">
-                      Shop Spring Collection
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <button onClick={() => setActiveTab("categories")} className="w-full sm:w-auto bg-brand text-white px-10 py-5 rounded-sm text-xs font-bold tracking-[0.2em] uppercase hover:bg-brand-dark transition-all transform hover:-translate-y-1 shadow-2xl shadow-brand/20 active:scale-95">
+                        Shop Collection
+                      </button>
+                      <button onClick={() => setActiveTab("categories")} className="w-full sm:w-auto px-10 py-5 rounded-sm text-xs font-bold tracking-[0.2em] uppercase border border-border hover:bg-white transition-all">
+                        Lookbook '26
+                      </button>
+                    </div>
                   </motion.div>
 
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex-1 grid grid-cols-2 gap-3 md:gap-4 h-[300px] md:h-[450px]"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1 }}
+                    className="flex-1 relative"
                   >
-                    <div className="col-span-2 h-[180px] md:h-[250px]">
-                      <img src={products[0].img} className="w-full h-full object-cover rounded-sm shadow-xl" alt="Model" />
+                    <div className="grid grid-cols-12 gap-4 h-[400px] md:h-[600px]">
+                      <div className="col-span-8 h-full rounded-sm overflow-hidden shadow-2xl">
+                         <img src={products[0].img} className="w-full h-full object-cover hover:scale-110 transition-transform duration-[2s]" alt="Model" />
+                      </div>
+                      <div className="col-span-4 flex flex-col gap-4">
+                         <div className="flex-1 rounded-sm overflow-hidden shadow-xl">
+                            <img src={products[1].img} className="w-full h-full object-cover" alt="Detail" />
+                         </div>
+                         <div className="flex-1 rounded-sm overflow-hidden shadow-xl">
+                            <img src={products[2].img} className="w-full h-full object-cover" alt="Detail" />
+                         </div>
+                      </div>
                     </div>
-                    <div className="h-[100px] md:h-[180px]">
-                      <img src={products[1].img} className="w-full h-full object-cover rounded-sm" alt="Model" />
-                    </div>
-                    <div className="h-[100px] md:h-[180px]">
-                      <img src={products[2].img} className="w-full h-full object-cover rounded-sm" alt="Model" />
-                    </div>
+                    {/* Decorative Elements */}
+                    <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-brand/5 rounded-full blur-3xl -z-10"></div>
+                    <div className="absolute -top-6 -left-6 w-32 h-32 bg-brand/5 rounded-full blur-3xl -z-10"></div>
                   </motion.div>
                 </div>
-              </section>
+              </motion.section>
 
               {/* Featured Products */}
               <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 md:px-8">
@@ -471,16 +503,39 @@ export default function App() {
                 </div>
               </section>
 
-              {/* Category Banners */}
-              <section className="py-16 bg-light">
+      {/* Category Section */}
+              <section className="py-24 bg-white">
                 <div className="max-w-7xl mx-auto px-4 md:px-8">
-                   <h2 className="font-serif text-2xl md:text-3xl font-bold mb-10 text-center">Shop By Occasion</h2>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <CategoryCard onClick={() => setActiveTab("categories")} title="Festive Radiance" img="https://byshree.com/cdn/shop/files/FESTIVE_RADIANCE_banner_800_x_640_jpg.jpg?v=1773601929&width=600" />
-                      <CategoryCard onClick={() => setActiveTab("categories")} title="Daily Rhythm" img="https://byshree.com/cdn/shop/files/DAILY_RHYTHM_banner_800_x_640_jpg.jpg?v=1773601929&width=600" />
-                      <CategoryCard onClick={() => setActiveTab("categories")} title="Glam Soul" img="https://byshree.com/cdn/shop/files/glam_soul_banner_800_x_640_jpg.jpg?v=1773601929&width=600" />
-                      <CategoryCard onClick={() => setActiveTab("categories")} title="Free Spirit" img="https://byshree.com/cdn/shop/files/FREE_SPIRIT_banner_W800-x-H640_jpg.jpg?v=1773601930&width=600" />
-                   </div>
+                  <div className="flex flex-col items-center mb-16">
+                     <span className="text-brand font-black text-[10px] tracking-[0.5em] uppercase mb-4">Curated Style</span>
+                     <h2 className="font-serif text-3xl md:text-5xl font-bold italic">Signature Collections</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                     <CategoryCard 
+                      onClick={() => setActiveTab("categories")} 
+                      title="Ethereal Festive" 
+                      subtitle="Shine in Heritage"
+                      img="https://byshree.com/cdn/shop/files/FESTIVE_RADIANCE_banner_800_x_640_jpg.jpg?v=1773601929&width=600" 
+                    />
+                     <CategoryCard 
+                      onClick={() => setActiveTab("categories")} 
+                      title="Daily Serenity" 
+                      subtitle="Cloud-Soft Cotton"
+                      img="https://byshree.com/cdn/shop/files/DAILY_RHYTHM_banner_800_x_640_jpg.jpg?v=1773601929&width=600" 
+                    />
+                     <CategoryCard 
+                      onClick={() => setActiveTab("categories")} 
+                      title="The Glam Room" 
+                      subtitle="Midnight Allure"
+                      img="https://byshree.com/cdn/shop/files/glam_soul_banner_800_x_640_jpg.jpg?v=1773601929&width=600" 
+                    />
+                     <CategoryCard 
+                      onClick={() => setActiveTab("categories")} 
+                      title="Modern Muse" 
+                      subtitle="Breezy Elegance"
+                      img="https://byshree.com/cdn/shop/files/FREE_SPIRIT_banner_W800-x-H640_jpg.jpg?v=1773601930&width=600" 
+                    />
+                  </div>
                 </div>
               </section>
 
@@ -682,7 +737,7 @@ export default function App() {
                         }}
                         className="w-full bg-[#25D366] text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2"
                       >
-                        <Instagram className="w-4 h-4" /> {/* Swap with MessageSquare if preferred */}
+                        <MessageSquare className="w-4 h-4" />
                         Pay Via WhatsApp
                       </button>
                       
@@ -694,8 +749,8 @@ export default function App() {
                         }}
                         className="w-full bg-dark text-white py-4 rounded-sm text-xs font-bold uppercase tracking-widest hover:bg-brand-dark transition-all flex items-center justify-center gap-2"
                       >
-                        <ShoppingBag className="w-4 h-4" />
-                        Google Pay / UPI
+                        <Zap className="w-4 h-4" />
+                        GPay / PhonePe / UPI
                       </button>
                     </div>
 
@@ -1296,17 +1351,46 @@ function DownloadAppSection({ deferredPrompt, onInstall }: { deferredPrompt: any
 
 function MetricCard({ label, value, change, isPositive, icon }: { label: string; value: string; change: string; isPositive: boolean; icon: ReactNode }) {
   return (
-    <div className="bg-white p-6 rounded-sm shadow-sm border border-border">
+    <motion.div 
+      whileHover={{ y: -4, shadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+      className="bg-white p-6 rounded-sm border border-border transition-all"
+    >
       <div className="flex items-center justify-between mb-4">
-        <div className="p-2 bg-light rounded text-brand">{icon}</div>
-        <div className={`flex items-center gap-1 text-[10px] font-bold ${isPositive ? 'text-green-600' : 'text-sale'}`}>
+        <div className="p-3 bg-brand/5 rounded-lg text-brand border border-brand/10">{icon}</div>
+        <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${isPositive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
           {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
           {change}
         </div>
       </div>
-      <h4 className="text-[10px] font-bold uppercase tracking-widest text-mid mb-1">{label}</h4>
-      <div className="text-2xl font-bold text-dark">{value}</div>
-    </div>
+      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-mid mb-2">{label}</h4>
+      <div className="text-3xl font-bold text-dark tracking-tight">{value}</div>
+      <div className="mt-4 pt-4 border-t border-border/50">
+        <div className="w-full bg-light h-1 rounded-full overflow-hidden">
+          <motion.div 
+            initial={{ width: 0 }}
+            whileInView={{ width: "70%" }}
+            className={`h-full ${isPositive ? 'bg-brand' : 'bg-mid'}`}
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function CategoryCard({ onClick, title, subtitle, img }: { onClick: () => void; title: string; subtitle: string; img: string }) {
+  return (
+    <motion.div 
+      whileHover={{ y: -8 }}
+      onClick={onClick}
+      className="group relative cursor-pointer aspect-[3/4] overflow-hidden rounded-sm shadow-sm"
+    >
+      <img src={img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-110" alt={title} />
+      <div className="absolute inset-0 bg-gradient-to-t from-dark/90 via-dark/20 to-transparent p-6 flex flex-col justify-end transition-all group-hover:from-brand/80">
+        <span className="text-[9px] font-black text-brand-light uppercase tracking-[0.3em] mb-2">{subtitle}</span>
+        <h3 className="text-white font-serif text-2xl font-bold">{title}</h3>
+        <div className="w-0 group-hover:w-16 h-1 bg-white mt-4 transition-all duration-500 rounded-full"></div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -1360,53 +1444,58 @@ interface ProductCardProps {
 function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart }: ProductCardProps) {
   return (
     <motion.div 
-      whileHover={{ y: -5 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -8 }}
       className="group cursor-pointer"
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-light mb-4">
-        <img 
+      <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-light mb-4 shadow-sm group-hover:shadow-xl transition-all duration-500">
+        <motion.img 
           src={product.img} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
           alt={product.name} 
         />
-        <div className="absolute top-2 left-2 bg-sale text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">
-          -{product.discount}%
+        {product.discount > 0 && (
+          <div className="absolute top-3 left-3 bg-sale text-white text-[9px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full shadow-lg">
+            -{product.discount}%
+          </div>
+        )}
+        
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+            <button 
+              onClick={(e) => { e.stopPropagation(); onToggleWishlist(product.id); }}
+              className={`p-2 rounded-full backdrop-blur-md transition-all duration-300 shadow-lg ${isWishlisted ? 'bg-brand text-white' : 'bg-white/80 text-mid hover:bg-white hover:text-brand'}`}
+            >
+              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-current' : ''}`} />
+            </button>
         </div>
-        <button 
-          onClick={(e) => { e.stopPropagation(); onAddToCart(); }} 
-          className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm text-dark font-bold text-[10px] uppercase py-3 rounded-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
-        >
-          Add To Bag
-        </button>
-        <button 
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleWishlist(product.id);
-          }}
-          className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-300 ${isWishlisted ? 'bg-brand text-white shadow-lg' : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/30'}`}
-        >
-          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-        </button>
+
+        <div className="absolute inset-x-4 bottom-4 translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+          <button 
+            onClick={(e) => { e.stopPropagation(); onAddToCart(); }} 
+            className="w-full bg-brand text-white font-bold text-[10px] uppercase tracking-[0.2em] py-4 rounded-sm shadow-2xl flex items-center justify-center gap-2"
+          >
+            <ShoppingBag className="w-3 h-3" />
+            Add To Bag
+          </button>
+        </div>
       </div>
-      <h3 className="text-[11px] md:text-sm font-medium text-dark line-clamp-1 mb-1">{product.name}</h3>
-      <div className="flex items-baseline gap-2">
-        <span className="font-bold text-sm">₹{product.price}</span>
-        <span className="text-mid/50 text-[10px] line-through">₹{product.origPrice}</span>
+
+      <div className="space-y-1.5 px-1">
+        <div className="flex items-center justify-between gap-2 overflow-hidden">
+          <h4 className="text-[11px] font-bold text-dark truncate flex-1 uppercase tracking-wider">{product.name}</h4>
+          <span className="text-[10px] font-black text-brand">₹{product.price}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {product.origPrice > product.price && (
+            <span className="text-[10px] text-mid line-through opacity-60">₹{product.origPrice}</span>
+          )}
+          <span className="text-[9px] text-[#22c55e] font-bold uppercase tracking-tight">Free Delivery</span>
+        </div>
       </div>
     </motion.div>
   );
 }
 
-function CategoryCard({ title, img, onClick }: { title: string; img: string; onClick?: () => void }) {
-  return (
-    <div onClick={onClick} className="relative h-48 md:h-64 group overflow-hidden rounded-sm cursor-pointer shadow-lg">
-      <img src={img} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={title} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent flex flex-col justify-end p-6">
-        <h3 className="text-white font-serif text-lg font-bold mb-2">{title}</h3>
-        <div className="flex items-center text-white/80 text-[10px] font-bold uppercase tracking-widest gap-2 group-hover:text-white transition-colors">
-          Shop Now <ChevronRight className="w-3 h-3" />
-        </div>
-      </div>
-    </div>
-  );
-}
